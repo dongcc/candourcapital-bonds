@@ -35,94 +35,92 @@ This skill queries Candour Capital's bonds listings to retrieve current AUD and 
 
 1. **Fetches data** from `https://candourcapital.com/bonds/` (both AUD and USD bond pages)
 2. **Parses bond details**: issuer, type, coupon rate, issue/maturity dates, ratings, currency
-3. **Extracts term sheet/apply links**: Each bond includes a link to view term sheets or apply (either RegistryDirect offer pages or email contacts)
-4. **Optionally downloads PDFs**: Can fetch publicly accessible term sheet PDFs (requires `requests` library)
-5. **Generates interactive HTML dashboard** with:
+3. **Generates term sheet/apply links**: 
+   - RegistryDirect offer pages (where available)
+   - Email links with pre-filled subjects for term sheet requests or applications
+4. **Creates interactive HTML dashboards** with:
    - Summary statistics cards
    - Coupon rate comparison chart (AUD vs USD)
    - Currency distribution pie chart
    - Coupon rate distribution
    - Maturity timeline visualization
-   - Detailed sortable/filterable table with **"Term Sheet / Apply"** links
-6. **Includes source attribution** with live link back to Candour Capital
+   - Detailed sortable/filterable table with **separate Term Sheet and Apply** links
+5. **Includes source attribution** with live link back to Candour Capital
 
 ## Usage
 
-Simply ask for Candour Capital bonds analysis:
-
+### All Bonds Dashboard (Default)
 ```
 Show me Candour Capital bonds with charts
 ```
+Generates a dashboard with all 23 bonds (15 AUD + 8 USD) with filtering tabs.
 
-The skill will automatically:
-- Scrape the bonds listings
-- Create an interactive HTML file
-- Open it in your browser
-- Provide a screenshot
-
-### Downloading Term Sheets
-
-To download available term sheet PDFs (where publicly accessible):
-
-```bash
-cd ~/.openclaw/workspace/skills/candourcapital-bonds/scripts
-python3 download_termsheets.py
+### Currency-Specific Dashboards
+```
+Show me Candour Capital AUD bonds with charts
+Show me Candour Capital USD bonds with charts
 ```
 
-This will:
-- Attempt to fetch PDFs from RegistryDirect links
-- Skip email links (mailto:) - those require manual email request
-- Save files to `output/pdfs/` directory
-- Report success/failure for each bond
+### Command-Line Usage
+```bash
+cd ~/.openclaw/workspace/skills/candourcapital-bonds/scripts
+python3 generate_dashboard_unified.py --currency ALL   # All bonds (default)
+python3 generate_dashboard_unified.py --currency AUD   # AUD only (15 bonds)
+python3 generate_dashboard_unified.py --currency USD   # USD only (8 bonds)
+```
 
-Note: Many term sheets require authentication on RegistryDirect. Only publicly accessible PDFs will download.
+Each command generates an HTML file in `output/` and can be opened in a browser.
 
 ## Output Includes
 
 - **Statistics**: Total bonds, AUD/USD split, average coupon
-- **Visualizations**: 4 Chart.js charts (bar, doughnut, pie, line)
-- **Table**: Full bond details with filtering tabs (All/AUD/USD)
-- **Term Sheet Links**: Direct "View" or "Email" buttons for each bond
-- **Source link**: Direct attribution to candourcapital.com/bonds/
-- **Ratings**: Color-coded by credit quality (high/medium/low)
+- **Visualizations**: 4 Chart.js charts
+  - Coupon rates bar chart (by issuer, colored by currency)
+  - Currency distribution doughnut chart
+  - Coupon distribution pie chart (by range)
+  - Maturity timeline line chart
+- **Detailed table** with columns:
+  - Issuer, Type, Coupon, Issue Date, Maturity, Rating, Currency
+  - **Term Sheet** button (📄 PDF or 📧 Email)
+  - **Apply** button (🖊️ Apply or 📧 Email)
+- **Filtering tabs**: All / AUD Only / USD Only
+- **Source attribution** with live link
+
+## Term Sheet Access
+
+- **Direct PDF**: For select bonds with RegistryDirect offer pages (e.g., UBS 6.375% AUD, BNP Paribas AUD). Clicking downloads the term sheet (may require login).
+- **Email Request**: For most bonds, clicking opens email client with a pre-filled, properly formatted subject line to info@candourcapital.com.
+- **Apply**: Links to RegistryDirect application pages where available, otherwise email.
 
 ## Data Fields
 
-For each bond, the skill captures:
-- Issuer name
-- Bond type (Fixed Rate, Floating, Perpetual, etc.)
-- Coupon rate (% p.a.)
-- Issue date
-- Maturity date (or "Perpetual")
-- Credit rating (Moody's/S&P/Fitch)
-- Currency (AUD/USD)
-- Call date (if applicable)
-- Capital tier / seniority
-- Coupon frequency
-- **Term sheet URL** (link to view/apply)
+Each bond includes:
+- Issuer, Type, Coupon (% p.a.), Issue Date, Maturity Date, Rating
+- Currency (AUD/USD), Call Date, Capital Tier/Seniority, Coupon Frequency
+- `term_sheet_url` and `apply_url`
 
 ## Limitations
 
-- Data is scraped from publicly accessible pages (may require investor declaration click)
-- Only includes bonds listed on the website (not exhaustive market)
+- Data is scraped from publicly accessible pages (may require investor declaration)
+- Only includes bonds listed on the website
 - No real-time pricing or yield calculations
-- Static snapshot (doesn't track intraday changes)
-- Intended for wholesale investors only (as per website)
-- PDF downloads limited by RegistryDirect authentication requirements
+- Static snapshot
+- Intended for wholesale investors only
 
 ## Files
 
-- `scripts/fetch_candour_bonds.py` - Scrapes and parses bond data with term sheet URLs
-- `scripts/generate_dashboard.py` - Creates HTML dashboard with links
-- `scripts/download_termsheets.py` - Attempts to download term sheet PDFs
-- `assets/dashboard_template.html` - Chart.js template with term sheet column
+- `scripts/fetch_candour_bonds.py` - Fetches and parses bond data
+- `scripts/generate_dashboard_unified.py` - Main dashboard generator (supports ALL/AUD/USD)
+- `scripts/generate_aud_dashboard.py` - AUD-only generator (legacy)
+- `scripts/generate_usd_dashboard.py` - USD-only generator (legacy)
+- `assets/full_dashboard_template.html` - Template for all bonds
+- `assets/aud_dashboard_template.html` - Template for AUD only
+- `assets/usd_dashboard_template.html` - Template for USD only
 
 ## Example Output
 
-The dashboard shows recent issuances from:
-- **AUD**: Commonwealth Bank, UBS, Westpac, ANZ, NAB, BNP Paribas, HSBC, etc.
-- **USD**: Mineral Resources, HSBC, Barclays, Société Générale, UBS, etc.
-
-Each bond has a "📄 View" (or "📧 Email") button linking directly to the term sheet or application page.
+The dashboard displays recent issuances from:
+- **AUD**: Commonwealth Bank, UBS, Westpac, ANZ, NAB, BNP Paribas, HSBC, Crédit Agricole, Ampol, AGL, AusNet, Électricité de France, etc.
+- **USD**: Mineral Resources, HSBC, Barclays, BNP Paribas, Standard Chartered, Société Générale, UBS.
 
 All with proper attribution back to Candour Capital.

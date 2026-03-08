@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Candour Capital USD Bonds</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+        .stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 15px 25px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 24px; font-weight: bold; }
+        .stat-label { font-size: 12px; opacity: 0.9; }
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .chart-box { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .chart-title { text-align: center; font-weight: 600; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th { background: #e74c3c; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f0f0f0; }
+        .positive { color: #28a745; }
+        .mailto { color: #dc3545; }
+        .web { color: #28a745; }
+        a { text-decoration: none; font-size: 12px; padding: 3px 8px; border-radius: 3px; }
+        .mailto-link { background: #dc3545; color: white; }
+        .web-link { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Candour Capital USD Bonds</h1>
+        <div class="subtitle">Source: <a href="{{SOURCE_URL}}" target="_blank">{{SOURCE_URL}}</a></div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="total-bonds">0</div>
+                <div class="stat-label">Total USD Bonds</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avg-coupon">0%</div>
+                <div class="stat-label">Average Coupon</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-title">Coupon Rates</div>
+                <canvas id="couponChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <div class="chart-title">Maturity Timeline</div>
+                <canvas id="maturityChart"></canvas>
+            </div>
+        </div>
+
+        <h2>📋 Bond Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Issuer</th>
+                    <th>Type</th>
+                    <th>Coupon</th>
+                    <th>Issue</th>
+                    <th>Maturity</th>
+                    <th>Rating</th>
+                    <th>Term Sheet</th>
+                    <th>Apply</th>
+                </tr>
+            </thead>
+            <tbody id="bonds-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const bondsData = {"source": "Candour Capital", "source_url": "https://candourcapital.com/bonds/", "last_updated": "2026-03-08 17:02:08", "summary": {"total_bonds": 8, "aud_count": 0, "usd_count": 8, "avg_coupon": 5.79}, "bonds": [{"issuer": "Mineral Resources", "type": "Fixed Rate Bond", "coupon": 9.25, "issue_date": "3-Oct-2023", "maturity_date": "1-Oct-2028", "rating": "BB/-", "rating_fitch": "BB", "rating_moodys": null, "seniority": "Senior Unsecured", "coupon_freq": "Semi-Annually", "call_date": "1-Oct-2025", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Mineral%20Resources%20Fixed%20Rate%20Bond%20due%201Oct2028", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Mineral%20Resources%20Fixed%20Rate%20Bond%20due%201Oct2028"}, {"issuer": "HSBC", "type": "Fixed to Floating Rate Bond", "coupon": 1.57, "issue_date": "14-Aug-2023", "maturity_date": "14-Aug-2027", "rating": "A+/-", "rating_fitch": "A+", "rating_moodys": null, "seniority": "Senior Unsecured", "coupon_freq": "Quarterly", "call_date": "14-Aug-2026", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%2014Aug2027", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%2014Aug2027"}, {"issuer": "BNP Paribas", "type": "Fixed: Resettable Bond", "coupon": 8.5, "issue_date": "14-Aug-2023", "maturity_date": "Perpetual", "rating": "A+/Aa3", "rating_fitch": "A+", "rating_moodys": "Aa3", "seniority": "Junior Unsecured", "coupon_freq": "Semi-Annually", "call_date": "14-Aug-2028", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20BNP%20Paribas%20Fixed%3A%20Resettable%20Bond%20due%20Perpetual", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20BNP%20Paribas%20Fixed%3A%20Resettable%20Bond%20due%20Perpetual"}, {"issuer": "Standard Chartered", "type": "Floating Rate Bond", "coupon": 1.93, "issue_date": "6-Jul-2023", "maturity_date": "6-Jul-2027", "rating": "A/-", "rating_fitch": "A", "rating_moodys": null, "seniority": "Senior Unsecured", "coupon_freq": "Quarterly", "call_date": "6-Jul-2026", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Standard%20Chartered%20Floating%20Rate%20Bond%20due%206Jul2027", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Standard%20Chartered%20Floating%20Rate%20Bond%20due%206Jul2027"}, {"issuer": "Barclays", "type": "Fixed to Floating Rate Bond", "coupon": 7.119, "issue_date": "27-Jun-2023", "maturity_date": "27-Jun-2034", "rating": "A/Baa1", "rating_fitch": "A", "rating_moodys": "Baa1", "seniority": "Subordinated Unsecured", "coupon_freq": "Semi-Annually", "call_date": "27-Jun-2033", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Barclays%20Fixed%20to%20Floating%20Rate%20Bond%20due%2027Jun2034", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Barclays%20Fixed%20to%20Floating%20Rate%20Bond%20due%2027Jun2034"}, {"issuer": "Soci\u00e9t\u00e9 G\u00e9n\u00e9rale", "type": "Fixed Rate Bond", "coupon": 7.367, "issue_date": "10-Jun-2023", "maturity_date": "10-Jun-2053", "rating": "A-/A1", "rating_fitch": "A-", "rating_moodys": "A1", "seniority": "Subordinated Unsecured", "coupon_freq": "Semi-Annually", "call_date": "-", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Soci%C3%A9t%C3%A9%20G%C3%A9n%C3%A9rale%20Fixed%20Rate%20Bond%20due%2010Jun2053", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Soci%C3%A9t%C3%A9%20G%C3%A9n%C3%A9rale%20Fixed%20Rate%20Bond%20due%2010Jun2053"}, {"issuer": "UBS", "type": "Fixed to Floating Rate Bond", "coupon": 9.016, "issue_date": "14-Nov-2022", "maturity_date": "15-Nov-2033", "rating": "A/-", "rating_fitch": "A", "rating_moodys": null, "seniority": "Senior Unsecured", "coupon_freq": "Semi-Annually", "call_date": "15-Nov-2032", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20UBS%20Fixed%20to%20Floating%20Rate%20Bond%20due%2015Nov2033", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Fixed%20to%20Floating%20Rate%20Bond%20due%2015Nov2033"}, {"issuer": "UBS", "type": "Floating Rate Bond", "coupon": 1.58, "issue_date": "12-May-2022", "maturity_date": "12-May-2026", "rating": "A/-", "rating_fitch": "A", "rating_moodys": null, "seniority": "Senior Unsecured", "coupon_freq": "Quarterly", "call_date": "12-May-2025", "currency": "USD", "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20UBS%20Floating%20Rate%20Bond%20due%2012May2026", "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Floating%20Rate%20Bond%20due%2012May2026"}], "generated_at": "2026-03-08 17:02:08"};
+        const bonds = bondsData.bonds;
+
+        // Stats
+        document.getElementById('total-bonds').textContent = bonds.length;
+        document.getElementById('avg-coupon').textContent = bondsData.summary.avg_coupon + '%';
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('bonds-body');
+            tbody.innerHTML = bonds.map(b => `
+                <tr>
+                    <td><strong>${b.issuer}</strong></td>
+                    <td>${b.type}</td>
+                    <td class="${b.coupon >= 7 ? 'positive' : ''}">${b.coupon}% p.a.</td>
+                    <td>${b.issue_date}</td>
+                    <td>${b.maturity_date}</td>
+                    <td>${b.rating || 'N/A'}</td>
+                    <td><a href="${b.term_sheet_url}" target="_blank" class="${b.term_sheet_url.startsWith('mailto:') ? 'mailto-link' : 'web-link'}">${b.term_sheet_url.startsWith('mailto:') ? '📧 Email' : '📄 PDF'}</a></td>
+                    <td><a href="${b.apply_url}" target="_blank" class="${b.apply_url.startsWith('mailto:') ? 'mailto-link' : 'web-link'}">${b.apply_url.startsWith('mailto:') ? '📧 Email' : '🖊️ Apply'}</a></td>
+                </tr>
+            `).join('');
+        }
+        renderTable();
+
+        // Chart 1: Coupon rates
+        const couponCtx = document.getElementById('couponChart').getContext('2d');
+        new Chart(couponCtx, {
+            type: 'bar',
+            data: {
+                labels: bonds.map(b => b.issuer.length > 12 ? b.issuer.substring(0,10) + '...' : b.issuer),
+                datasets: [{
+                    label: 'Coupon (%)',
+                    data: bonds.map(b => b.coupon),
+                    backgroundColor: bonds.map(b => b.coupon >= 7 ? 'rgba(220,53,69,0.8)' : 'rgba(40,167,69,0.8)'),
+                    borderColor: bonds.map(b => b.coupon >= 7 ? 'rgba(220,53,69,1)' : 'rgba(40,167,69,1)'),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Coupon %' } } }
+            }
+        });
+
+        // Chart 2: Maturity timeline
+        const maturityCtx = document.getElementById('maturityChart').getContext('2d');
+        function parseMaturity(str) {
+            if (str === 'Perpetual') return null;
+            const parts = str.split('-');
+            if (parts.length !== 3) return null;
+            const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+            return new Date(parseInt(parts[2]), months[parts[1]], parseInt(parts[0]));
+        }
+        const sortedBonds = bonds.filter(b => parseMaturity(b.maturity_date)).sort((a,b) => parseMaturity(a.maturity_date) - parseMaturity(b.maturity_date));
+        new Chart(maturityCtx, {
+            type: 'line',
+            data: {
+                labels: sortedBonds.map(b => b.issuer.length > 12 ? b.issuer.substring(0,10) + '...' : b.issuer),
+                datasets: [{
+                    label: 'Maturity Year',
+                    data: sortedBonds.map(b => parseMaturity(b.maturity_date).getFullYear()),
+                    borderColor: 'rgba(102,126,234,1)',
+                    backgroundColor: 'rgba(102,126,234,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { title: { display: true, text: 'Year' } } }
+            }
+        });
+    </script>
+</body>
+</html>
