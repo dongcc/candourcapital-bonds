@@ -16,8 +16,14 @@ try:
 except ImportError:
     HAS_AUTOMATION = False
 
+# Known RegistryDirect offer pages (publicly accessible after investor declaration)
+REGISTRYDIRECT_URLS = {
+    ('BNP Paribas', 'Perpetual Bond', 'AUD'): 'https://www.registrydirect.com.au/offer/bnp-aud-fixed-to-floating-rate-bond-due-dec-2036/',
+    ('UBS', 'Perpetual Bond', 'AUD', 6.375): 'https://www.registrydirect.com.au/offer/ubs-aud-perpetual-bond-due-2030/',
+}
+
 # Hardcoded recent bonds data (as of March 2026)
-# This serves as fallback when browser automation isn't available
+# term_sheet_url: Link to view term sheet / bond details
 AUD_BONDS_FALLBACK = [
     {
         "issuer": "Commonwealth Bank",
@@ -31,7 +37,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "-",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Commonwealth%20Bank%20Fixed%20Rate%20Bond%20due%202046",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Commonwealth%20Bank%20Fixed%20Rate%20Bond%20due%202046"
     },
     {
         "issuer": "UBS",
@@ -45,7 +53,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Additional Tier 1",
         "coupon_freq": "Semi-Annually",
         "call_date": "13-Aug-2032",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20UBS%20Perpetual%20Bond%20due%202032",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Perpetual%20Bond%20due%202032"
     },
     {
         "issuer": "Crédit Agricole",
@@ -59,7 +69,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "13-Feb-2036",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Cr%C3%A9dit%20Agricole%20Fixed%20to%20Floating%20Rate%20Bond%20due%202041",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Cr%C3%A9dit%20Agricole%20Fixed%20to%20Floating%20Rate%20Bond%20due%202041"
     },
     {
         "issuer": "Westpac Banking",
@@ -73,7 +85,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "12-Feb-2036",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Westpac%20Fixed%20to%20Floating%20Rate%20Bond%20due%202041",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Westpac%20Fixed%20to%20Floating%20Rate%20Bond%20due%202041"
     },
     {
         "issuer": "AusNet",
@@ -87,7 +101,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "4-Feb-2036",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20AusNet%20Fixed%20to%20Floating%20Rate%20Bond%20due%202056",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20AusNet%20Fixed%20to%20Floating%20Rate%20Bond%20due%202056"
     },
     {
         "issuer": "BNP Paribas",
@@ -101,7 +117,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Additional Tier 1",
         "coupon_freq": "Semi-Annually",
         "call_date": "2-Jun-2031",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": REGISTRYDIRECT_URLS.get(('BNP Paribas', 'Perpetual Bond', 'AUD'), 'mailto:info@candourcapital.com'),
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20BNP%20Paribas%20Perpetual%20Bond"
     },
     {
         "issuer": "Westpac Banking",
@@ -115,7 +133,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "-",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Westpac%20Fixed%20Rate%20Bond%20due%202045",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Westpac%20Fixed%20Rate%20Bond%20due%202045"
     },
     {
         "issuer": "Ampol Limited",
@@ -129,7 +149,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "30-Jan-2034",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Ampol%20Fixed%20to%20Floating%20Rate%20Bond%20due%202055",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Ampol%20Fixed%20to%20Floating%20Rate%20Bond%20due%202055"
     },
     {
         "issuer": "UBS",
@@ -143,7 +165,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Additional Tier 1",
         "coupon_freq": "Semi-Annually",
         "call_date": "29-Sep-2030",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": REGISTRYDIRECT_URLS.get(('UBS', 'Perpetual Bond', 'AUD'), 'mailto:info@candourcapital.com'),
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Perpetual%20Bond"
     },
     {
         "issuer": "AGL Energy Limited",
@@ -157,7 +181,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "-",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20AGL%20Energy%20Fixed%20Rate%20Bond%20due%202035",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20AGL%20Energy%20Fixed%20Rate%20Bond%20due%202035"
     },
     {
         "issuer": "Électricité de France",
@@ -171,7 +197,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "28-Feb-2045",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20EdF%20Fixed%20Rate%20Bond%20due%202045",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20EdF%20Fixed%20Rate%20Bond%20due%202045"
     },
     {
         "issuer": "HSBC",
@@ -185,7 +213,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Senior Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "28-Aug-2035",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%202036",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%202036"
     },
     {
         "issuer": "ANZ Banking",
@@ -199,7 +229,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "-",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20ANZ%20Fixed%20Rate%20Bond%20due%202045",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20ANZ%20Fixed%20Rate%20Bond%20due%202045"
     },
     {
         "issuer": "ANZ Banking",
@@ -213,7 +245,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "14-Aug-2035",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20ANZ%20Fixed%20to%20Floating%20Rate%20Bond%20due%202040",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20ANZ%20Fixed%20to%20Floating%20Rate%20Bond%20due%202040"
     },
     {
         "issuer": "NAB",
@@ -227,7 +261,9 @@ AUD_BONDS_FALLBACK = [
         "capital_tier": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "30-Jul-2035",
-        "currency": "AUD"
+        "currency": "AUD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20NAB%20Fixed%20to%20Floating%20Rate%20Bond%20due%202040",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20NAB%20Fixed%20to%20Floating%20Rate%20Bond%20due%202040"
     }
 ]
 
@@ -244,7 +280,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Senior Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "1-Oct-2025",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Mineral%20Resources%20Fixed%20Rate%20Bond%20due%202028",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Mineral%20Resources%20Fixed%20Rate%20Bond%20due%202028"
     },
     {
         "issuer": "HSBC",
@@ -258,7 +296,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Senior Unsecured",
         "coupon_freq": "Quarterly",
         "call_date": "14-Aug-2026",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%202027",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20HSBC%20Fixed%20to%20Floating%20Rate%20Bond%20due%202027"
     },
     {
         "issuer": "BNP Paribas",
@@ -272,7 +312,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Junior Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "14-Aug-2028",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20BNP%20Paribas%20Fixed%20Resettable%20Bond%20due%20Perpetual",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20BNP%20Paribas%20Fixed%20Resettable%20Bond%20due%20Perpetual"
     },
     {
         "issuer": "Standard Chartered",
@@ -286,7 +328,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Senior Unsecured",
         "coupon_freq": "Quarterly",
         "call_date": "6-Jul-2026",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Standard%20Chartered%20Floating%20Rate%20Bond%20due%202027",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Standard%20Chartered%20Floating%20Rate%20Bond%20due%202027"
     },
     {
         "issuer": "Barclays",
@@ -300,7 +344,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "27-Jun-2033",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Barclays%20Fixed%20to%20Floating%20Rate%20Bond%20due%202034",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Barclays%20Fixed%20to%20Floating%20Rate%20Bond%20due%202034"
     },
     {
         "issuer": "Société Générale",
@@ -314,7 +360,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Subordinated Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "-",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20Soci%C3%A9t%C3%A9%20G%C3%A9n%C3%A9rale%20Fixed%20Rate%20Bond%20due%202053",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20Soci%C3%A9t%C3%A9%20G%C3%A9n%C3%A9rale%20Fixed%20Rate%20Bond%20due%202053"
     },
     {
         "issuer": "UBS",
@@ -328,7 +376,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Senior Unsecured",
         "coupon_freq": "Semi-Annually",
         "call_date": "15-Nov-2032",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20UBS%20Fixed%20to%20Floating%20Rate%20Bond%20due%202033",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Fixed%20to%20Floating%20Rate%20Bond%20due%202033"
     },
     {
         "issuer": "UBS",
@@ -342,7 +392,9 @@ USD_BONDS_FALLBACK = [
         "seniority": "Senior Unsecured",
         "coupon_freq": "Quarterly",
         "call_date": "12-May-2025",
-        "currency": "USD"
+        "currency": "USD",
+        "term_sheet_url": "mailto:info@candourcapital.com?subject=Term%20Sheet%20Request%20-%20UBS%20Floating%20Rate%20Bond%20due%202026",
+        "apply_url": "mailto:info@candourcapital.com?subject=Application%20-%20UBS%20Floating%20Rate%20Bond%20due%202026"
     }
 ]
 
@@ -364,6 +416,38 @@ def fetch_candour_bonds():
     else:
         # Use fallback static data
         all_bonds = AUD_BONDS_FALLBACK + USD_BONDS_FALLBACK
+
+    # Ensure all bonds have term_sheet_url (use RegistryDirect if known, else email)
+    for bond in all_bonds:
+        # Try with coupon-specific key first
+        key = (bond['issuer'], bond['type'], bond['currency'], bond['coupon'])
+        if key in REGISTRYDIRECT_URLS:
+            bond['term_sheet_url'] = REGISTRYDIRECT_URLS[key]
+        else:
+            # Try without coupon (fallback for broader matches)
+            key2 = (bond['issuer'], bond['type'], bond['currency'])
+            if key2 in REGISTRYDIRECT_URLS:
+                bond['term_sheet_url'] = REGISTRYDIRECT_URLS[key2]
+            else:
+                # Default to email request - format clean subject
+                issuer = bond['issuer']
+                bond_type = bond['type'].replace('% p.a.', '').replace('%', 'pct').strip()
+                maturity = bond['maturity_date']
+                if maturity == 'Perpetual':
+                    maturity_str = 'Perpetual'
+                else:
+                    # Convert DD-Mon-YYYY to DDMonYYYY for cleaner subject
+                    try:
+                        parts = maturity.split('-')
+                        if len(parts) == 3:
+                            maturity_str = f"{parts[0]}{parts[1]}{parts[2]}"
+                        else:
+                            maturity_str = maturity.replace('-', '')
+                    except:
+                        maturity_str = maturity.replace('-', '')
+                
+                subject = f"Term%20Sheet%20Request%20-%20{issuer.replace(' ','%20')}%20{bond_type.replace(' ','%20')}%20due%20{maturity_str}"
+                bond['term_sheet_url'] = f"mailto:info@candourcapital.com?subject={subject}"
 
     # Add source metadata
     result = {
