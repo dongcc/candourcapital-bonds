@@ -275,11 +275,12 @@
     </div>
 
     <script>
-        // Bond data injected from Python
-        const bondsData = {{DATA}};
-        const bonds = bondsData.bonds;
-        const audBonds = bonds.filter(b => b.currency === 'AUD');
-        const usdBonds = bonds.filter(b => b.currency === 'USD');
+        try {
+            // Bond data injected from Python
+            const bondsData = {{DATA}};
+            const bonds = bondsData.bonds;
+            const audBonds = bonds.filter(b => b.currency === 'AUD');
+            const usdBonds = bonds.filter(b => b.currency === 'USD');
 
         // Stats
         document.getElementById('total-bonds').textContent = bondsData.summary.total_bonds;
@@ -494,6 +495,9 @@
                 }
             }
         });
-    </script>
+    } catch (error) {
+        console.error('Dashboard error:', error);
+        document.body.innerHTML = '<div style="color:red; padding:20px;"><h1>Error loading dashboard</h1><pre>' + error.stack + '</pre></div>';
+    }
 </body>
 </html>
