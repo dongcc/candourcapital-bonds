@@ -186,7 +186,7 @@
 
         // Chart 3: Coupon distribution
         const distCtx = document.getElementById('distributionChart').getContext('2d');
-        const bins = [0,5,6,7,8,9,100].map((v,i) => ({min:v,max:[5,6,7,8,9,100][i]||100, label:f'{v}-{[5,6,7,8,9,100][i]||"∞"}%'}));
+        const bins = [0,5,6,7,8,9,100].map((v,i) => ({min:v,max:[5,6,7,8,9,100][i]||100, label: `${v}-${[5,6,7,8,9,100][i]||'∞'}%`}));
         const binData = bins.map(bin => allBonds.filter(b => b.coupon >= bin.min && b.coupon < bin.max).length);
         new Chart(distCtx, {
             type: 'pie',
