@@ -120,34 +120,153 @@
             }
         });
 
-        // Chart 2: Maturity timeline
+        // Chart 2: Maturity schedule (horizontal floating bars from issue to maturity)
         const maturityCtx = document.getElementById('maturityChart').getContext('2d');
-        function parseMaturity(str) {
-            if (str === 'Perpetual') return null;
+        function parseDate(str) {
+            if (!str) return null;
             const parts = str.split('-');
             if (parts.length !== 3) return null;
             const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-            return new Date(parseInt(parts[2]), months[parts[1]], parseInt(parts[0]));
+            return new Date(parseInt(parts[2]), months[parts[1]], parseInt(parts[0])).getFullYear();
         }
-        const sortedBonds = bonds.filter(b => parseMaturity(b.maturity_date)).sort((a,b) => parseMaturity(a.maturity_date) - parseMaturity(b.maturity_date));
+        // Helper to get bar color based on rating
+        function getBarColor(rating) {
+            if (!rating) return '#666';
+            const key = rating.split('/')[0].trim().toUpperCase();
+            const MOODYS_ORDER = ['Aaa','Aa1','Aa2','Aa3','A1','A2','A3','Baa1','Baa2','Baa3','Ba1','Ba2','Ba3','B1','B2','B3','Caa1','Caa2','Caa3','Ca','C'];
+            const SP_ORDER = ['AAA','AA+','AA','AA-','A+','A','A-','BBB+','BBB','BBB-','BB+','BB','BB-','B+','B','B-','CCC+','CCC','CCC-'];
+            let idx = -1;
+            const mIdx = MOODYS_ORDER.indexOf(key);
+            if (mIdx !== -1) idx = mIdx;
+            else {
+                const sIdx = SP_ORDER.indexOf(key);
+                if (sIdx !== -1) idx = sIdx;
+            }
+            let cls = 'C';
+            if (key) {
+                const first = key.charAt(0);
+                if (first === 'A') cls = 'A';
+                else if (first === 'B') cls = 'B';
+                else if (first === 'C') cls = 'C';
+            }
+            let level = 2;
+            if (cls === 'A') {
+                if (idx >= 0 && idx <= 6) level = Math.min(2, Math.floor(idx / 2));
+                else if (key === 'Aaa') level = 0;
+            } else if (cls === 'B') {
+                if (idx >= 7 && idx <= 12) level = Math.min(2, Math.floor((idx - 7) / 2));
+            } else if (cls === 'C') {
+                if (idx >= 13 && idx <= 17) level = Math.min(2, Math.floor((idx - 13) / 2));
+            }
+            const colors = {
+                A: ['#006400', '#008000', '#00cc00'],
+                B: ['#b8860b', '#daa520', '#ffd700'],
+                C: ['#8b0000', '#dc143c', '#ff0000']
+            };
+            return colors[cls] ? colors[cls][level] : '#666';
+        }
+        const maturityBars = bonds
+            .map(b => {
+                const issue = parseDate(b.issue_date);
+                let mat;
+                if (b.maturity_date === 'Perpetual') {
+                    mat = 2100;
+                } else {
+                    mat = parseDate(b.maturity_date);
+                }
+                if (!issue || !mat) return null;
+                let label = b.issuer;
+                if (label.length > 15) label = label.substring(0, 13) + '...';
+                label += ` (${b.coupon}%)`;
+                return {
+                    label: label,
+                    start: issue,
+                    end: mat,
+                    isPerpetual: b.maturity_date === 'Perpetual',
+                    rating: b.rating
+                };
+            })
+            .filter(item => item !== null);
+        const maturityLabels = maturityBars.map(b => b.label);
+        const maturityData = maturityBars.map(b => [b.start, b.end]);
+        const perpetualFlags = maturityBars.map(b => b.isPerpetual);
+        const barColors = maturityBars.map(b => getBarColor(b.rating));
+        const barBorderColors = barColors;
+        const perpetualLabelPlugin = {
+            id: 'perpetualLabel',
+            afterDatasetsDraw(chart) {
+                const { ctx, scales: { x } } = chart;
+                const text = 'Perpetual';
+                ctx.font = '12px sans-serif';
+                const textWidth = ctx.measureText(text).width;
+                const maxX = (chart.chartArea ? chart.chartArea.right : chart.width) - 4;
+                chart.data.datasets.forEach((dataset) => {
+                    const meta = chart.getDatasetMeta(0);
+                    meta.data.forEach((bar, index) => {
+                        if (perpetualFlags[index]) {
+                            const endValue = dataset.data[index][1];
+                            let xPos = x.getPixelForValue(endValue);
+                            const yPos = bar.y;
+                            if (xPos + 4 + textWidth > maxX) {
+                                xPos = xPos - textWidth - 4;
+                            } else {
+                                xPos = xPos + 4;
+                            }
+                            ctx.save();
+                            ctx.fillStyle = '#000';
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(text, xPos, yPos);
+                            ctx.restore();
+                        }
+                    });
+                });
+            }
+        };
+        const minIssueYear = Math.min(...maturityBars.map(b => b.start));
         new Chart(maturityCtx, {
-            type: 'line',
+            plugins: [perpetualLabelPlugin],
+            type: 'bar',
             data: {
-                labels: sortedBonds.map(b => b.issuer.length > 12 ? b.issuer.substring(0,10) + '...' : b.issuer),
+                labels: maturityLabels,
                 datasets: [{
-                    label: 'Maturity Year',
-                    data: sortedBonds.map(b => parseMaturity(b.maturity_date).getFullYear()),
-                    borderColor: 'rgba(102,126,234,1)',
-                    backgroundColor: 'rgba(102,126,234,0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 5
+                    label: 'Issue to Maturity',
+                    data: maturityData,
+                    backgroundColor: barColors,
+                    borderColor: barBorderColors,
+                    borderWidth: 1
                 }]
             },
             options: {
+                indexAxis: 'y',
                 responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { title: { display: true, text: 'Year' } } }
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const start = context.raw[0];
+                                const end = context.raw[1];
+                                return `${context.label}: ${start} - ${end}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        min: minIssueYear,
+                        max: 2100,
+                        title: { display: true, text: 'Year' },
+                        ticks: {
+                            callback: function(value) {
+                                return Math.round(value).toString();
+                            }
+                        }
+                    },
+                    y: {
+                        title: { display: true, text: 'Issuer' }
+                    }
+                }
             }
         });
     </script>
